@@ -6,6 +6,8 @@ import Footer from './components/footer/Footer'
 import HomePage from './components/home-page/HomePage'
 import RecipesList from './components/recipe-list/RecipeList'
 import RecipeDetails from './components/recipe-details/RecipeDetails'
+import Login from './components/login/Login';
+import Register from './components/register/Register';
 import './App.css'
 
 const HeaderSelector = () => {
@@ -28,6 +30,9 @@ function App() {
               <Route index element={<HomePage />} />
               <Route path="/recipes" element={<RecipesList />} />
               <Route path="/recipe/:id" element={<RecipeDetails />} />
+
+              <Route path="/login" element={<Login />} />
+              <Route path="/register" element={<Register />} />
             </Routes>
           </div>
 
