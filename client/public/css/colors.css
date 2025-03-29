@@ -1,0 +1,11 @@
+:root {
+  --app-color-white: #FFFFFF;
+  --app-color-black: #000000;
+  --app-color-bg-mask-base: #000000ab;
+  --app-color-bg-mask-lighter: #00000042;
+  --app-color-primary: #fc6c3f; }
+
+header.header-homepage {
+  background-color: rgba(0, 0, 0, 0.8); }
+
+/*# sourceMappingURL=colors.css.map */

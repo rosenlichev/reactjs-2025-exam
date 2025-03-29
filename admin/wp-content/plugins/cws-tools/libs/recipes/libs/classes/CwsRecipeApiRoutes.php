@@ -11,6 +11,13 @@ class CwsRecipeApiRoutes extends CwsAbstractBaseApiService
             'permission_callback' => '__return_true'
         ]);
 
+        register_rest_route($this->namespace, 'getRecipesHomepage', [
+            'methods'             => 'POST',
+            'callback'            => [$this, 'cwsToolsGetRecipesHomepage'],
+            'args'                => [],
+            'permission_callback' => '__return_true'
+        ]);
+
         register_rest_route($this->namespace, 'getRecipeDetails', [
             'methods'             => 'POST',
             'callback'            => [$this, 'cwsToolsGetRecipeDetails'],
@@ -43,6 +50,21 @@ class CwsRecipeApiRoutes extends CwsAbstractBaseApiService
 		$response = $recipes;
 
 		$this->api_send_json('getRecipes', $response ?? [], $status ?? 200);
+	}
+
+	public function cwsToolsGetRecipesHomepage(WP_REST_Request $request)
+	{
+		$_params 	= $request->get_json_params();
+		$params 	= [];
+
+		$params['posts_per_page'] = 6;
+		$params['orderby'] = 'rand';
+
+		$recipes = (new CwsRecipeService)->getRecipes($params);
+
+		$response = $recipes;
+
+		$this->api_send_json('getRecipesHomepage', $response ?? [], $status ?? 200);
 	}
 
 	public function cwsToolsGetRecipeDetails(WP_REST_Request $request)

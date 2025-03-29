@@ -15,13 +15,15 @@ class CwsRecipeService extends CwsBaseService
 	{
 		$recipes = [];
 
-		$query_args = [
+		$default_args = [
 			'post_type' 		=> 'recipe',
 			'post_status' 		=> 'publish',
 			'posts_per_page' 	=> -1,
 			'meta_query' 		=> [],
 			'tax_query' 		=> []
 		];
+
+		$query_args = array_merge($default_args, $params);
 
 		$query = new WP_Query($query_args);
 
@@ -32,7 +34,9 @@ class CwsRecipeService extends CwsBaseService
 					'name' 				=> $post->post_title,
 					'author' 			=> '',
 					'preparationTime' 	=> get_post_meta($post->ID, 'preparation_time', true) ?? '',
-					'image' 			=> ''
+					'image' 			=> '',
+					'liked' 			=> 0,
+					'comments' 			=> 0
 				];
 
 				$author_id = $post->post_author;
@@ -48,6 +52,16 @@ class CwsRecipeService extends CwsBaseService
 
 					if ($thumbnail_url) {
 						$prepareRecipe['image'] = $thumbnail_url;
+					}
+				}
+
+				$terms = get_the_terms($post->ID, 'recipe_category');
+
+				if (!empty($terms) && !is_wp_error($terms)) {
+					$term = $terms[key($terms)];
+
+					if ($term) {
+						$prepareRecipe['category'] = $term->name;
 					}
 				}
 
@@ -72,6 +86,8 @@ class CwsRecipeService extends CwsBaseService
 					'author' 			=> '',
 					'preparationTime' 	=> get_post_meta($post->ID, 'preparation_time', true) ?? '',
 					'image' 			=> '',
+					'liked' 			=> 0,
+					'comments' 			=> 0
 				];
 
 				$author_id = $post->post_author;

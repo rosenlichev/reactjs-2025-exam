@@ -1,9 +1,38 @@
+import { BrowserRouter, Routes, Route, useLocation } from 'react-router-dom';
+
+import HeaderHomepage from './components/header/HeaderHomepage'
+import Header from './components/header/Header'
+import Footer from './components/footer/Footer'
+import HomePage from './components/home-page/HomePage'
+import RecipesList from './components/recipe-list/RecipeList'
+import RecipeDetails from './components/recipe-details/RecipeDetails'
 import './App.css'
+
+const HeaderSelector = () => {
+  const location = useLocation();
+  
+  // Check if we're on the homepage (root path)
+  const isHomePage = location.pathname === '/';
+  
+  return isHomePage ? <HeaderHomepage /> : <Header />;
+};
 
 function App() {
   return (
     <>
-      <h1>Recipes</h1>
+      <div id="page">
+        <HeaderSelector />
+
+          <div id="site-content">
+            <Routes>
+              <Route index element={<HomePage />} />
+              <Route path="/recipes" element={<RecipesList />} />
+              <Route path="/recipe/:id" element={<RecipeDetails />} />
+            </Routes>
+          </div>
+
+        <Footer />
+      </div>
     </>
   )
 }

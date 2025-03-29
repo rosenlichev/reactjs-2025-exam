@@ -1,0 +1,7 @@
+{
+"version": 3,
+"mappings": "AAAA,KAAM;EACF,iBAAiB,CAAC,QAAQ;EAC1B,iBAAiB,CAAC,QAAQ;EAC1B,wBAAwB,CAAC,UAAU;EACnC,2BAA2B,CAAC,UAAU;EACtC,mBAAmB,CAAC,QAAQ;;AAI5B,sBAAkB;EACd,gBAAgB,EAAE,kBAAkB",
+"sources": ["css-source/colors.scss"],
+"names": [],
+"file": "colors.css"
+}
