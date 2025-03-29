@@ -8,14 +8,46 @@ class CwsUserApiRoutes extends CwsAbstractBaseApiService
             'methods'             => 'POST',
             'callback'            => [$this, 'cwsToolsRegisterUser'],
             'args'                => [],
-            'permission_callback' => '__return_true'
+            'permission_callback' => '__return_true',
+            'args'                => [
+                'first_name'            => [
+                    'required'          => true,
+                    'sanitize_callback' => 'sanitize_text_field'
+                ],
+                'last_name'             => [
+                    'required'          => true,
+                    'sanitize_callback' => 'sanitize_text_field'
+                ],
+                'email'                 => [
+                    'required'          => true,
+                    'sanitize_callback' => 'sanitize_email'
+                ],
+                'password'              => [
+                    'required'          => true,
+                    'sanitize_callback' => 'sanitize_text_field'
+                ],
+                'confirm_password'      => [
+                    'required'          => true,
+                    'sanitize_callback' => 'sanitize_text_field'
+                ],
+            ]
         ]);
 
         register_rest_route($this->namespace, 'loginUser', [
             'methods'             => 'POST',
             'callback'            => [$this, 'cwsToolsLoginUser'],
             'args'                => [],
-            'permission_callback' => '__return_true'
+            'permission_callback' => '__return_true',
+            'args'                => [
+                'email'                 => [
+                    'required'          => true,
+                    'sanitize_callback' => 'sanitize_email'
+                ],
+                'password'              => [
+                    'required'          => true,
+                    'sanitize_callback' => 'sanitize_text_field'
+                ],
+            ]
         ]);
 
         register_rest_route($this->namespace, 'getUser', [
@@ -35,8 +67,22 @@ class CwsUserApiRoutes extends CwsAbstractBaseApiService
 
     public function cwsToolsRegisterUser(WP_REST_Request $request)
     {
-        $_params = $request->get_json_params();
-        $params = [];
+        $cwsUserService = new CwsUserService();
+        $cwsUserService->setVars($request->get_json_params());
+
+        $responseData = $cwsUserService->createUser();
+
+        if ($responseData->has('errors') && $responseData->get('errors')->isNotEmpty()) {
+
+            $response   = ['message' => $responseData->get('errors')->first()];
+            $status     = 400;
+
+            $this->api_send_json('registerUser', $data, $status ?? 200);
+            die();
+
+        } else {
+            $response     = $responseData->get('data');
+        }
 
         $this->api_send_json('registerUser', $response ?? [], $status ?? 200);
     }
