@@ -35,8 +35,12 @@ class CwsRecipeApiRoutes extends CwsAbstractBaseApiService
 
 	public function cwsToolsGetRecipes(WP_REST_Request $request)
 	{
-		$_params = $request->get_json_params();
-		$params = [];
+		$_params 	= $request->get_json_params();
+		$params 	= [];
+
+		$recipes = (new CwsRecipeService)->getRecipes($params);
+
+		$response = $recipes;
 
 		$this->api_send_json('getRecipes', $response ?? [], $status ?? 200);
 	}
@@ -45,6 +49,14 @@ class CwsRecipeApiRoutes extends CwsAbstractBaseApiService
 	{
 		$_params = $request->get_json_params();
 		$params = [];
+
+		if (isset($_params['id']) && $_params['id'] != '') {
+            $params['id'] = $_params['id'] ?? 0;
+        }
+
+        $recipe = (new CwsRecipeService)->getRecipeDetails($params);
+
+        $response = $recipe;
 
 		$this->api_send_json('getRecipeDetails', $response ?? [], $status ?? 200);
 	}
