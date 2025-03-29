@@ -4,8 +4,6 @@ import RecipeListItem from "./recipe-list-item/RecipeListItem";
 export default function RecipesList() {
     const {recipes} = useRecipes();
 
-    console.log(recipes);
-
     return (
         <>
             <div className="page-wrapper">

@@ -13,3 +13,14 @@ export const useRecipes = () => {
 
     return { recipes };
 }
+
+export const useRecipe = (id) => {
+    const [recipe, setRecipe] = useState([]);
+
+    useEffect(() => {
+        request.apiRequest({}, {id: id}, `${baseUrl}/getRecipeDetails`)
+            .then(setRecipe);
+    }, []);
+
+    return { recipe };
+}
