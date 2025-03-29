@@ -15,7 +15,6 @@ export default function RecipesList() {
                             : <p className="text-2xl text-center">No recipes found.</p>
                         }
                     </div>
-
                 </section>
             </div>
         </>

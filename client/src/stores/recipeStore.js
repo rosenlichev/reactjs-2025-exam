@@ -14,6 +14,17 @@ export const useRecipes = () => {
     return { recipes };
 }
 
+export const useHomepageRecipes = () => {
+    const [recipes, setRecipes] = useState([]);
+
+    useEffect(() => {
+        request.apiRequest({}, {}, `${baseUrl}/getRecipesHomepage`)
+            .then(setRecipes);
+    }, []);
+
+    return { recipes };
+}
+
 export const useRecipe = (id) => {
     const [recipe, setRecipe] = useState([]);
 

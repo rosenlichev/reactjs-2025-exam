@@ -136,9 +136,11 @@ header {
 
 #site-content {
     .page-wrapper {
-        max-width: 1460px;
-        margin-left: auto;
-        margin-right: auto;
+        section {
+            max-width: 1460px;
+            margin-left: auto;
+            margin-right: auto;
+        }
     }
 }
 
