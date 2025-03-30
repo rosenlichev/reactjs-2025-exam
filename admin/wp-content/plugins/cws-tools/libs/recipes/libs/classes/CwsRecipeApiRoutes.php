@@ -127,6 +127,11 @@ class CwsRecipeApiRoutes extends CwsAbstractBaseApiService
             die();
 
         } else {
+        	if (!empty($_FILES) && $responseData->get('data')->has('id')) {
+        		$post_id = $responseData->get('data')->get('id');
+        		$CwsRecipeService->saveRecipeImage($post_id, $_FILES);
+        	}
+
             $response = $responseData->get('data');
         }
 

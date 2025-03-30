@@ -228,6 +228,10 @@ class CwsRecipeService extends CwsBaseService
 			$fields->put('preparation', $this->vars->get('preparation'));
 		}
 
+		if ($this->vars->has('image')) {
+			$fields->put('image', $this->vars->get('image'));
+		}
+
         return $fields;
 	}
 
@@ -261,6 +265,8 @@ class CwsRecipeService extends CwsBaseService
 			if ($fields->has('post_excerpt')) {
 				$post_fields['post_excerpt'] = $fields->get('post_excerpt');
 			}
+
+			__sd($post_fields, "POST FIELDS BEFORE SAVE");
 
 			$post_id = wp_update_post($post_fields);
 		} else {
@@ -310,11 +316,72 @@ class CwsRecipeService extends CwsBaseService
 				update_post_meta($post_id, 'ingredients', $fields->get('ingredients'));
 			}
 
+			if ($fields->has('image') && $fields->get('image') != '') {
+				$saveThumbnail = $this->saveRecipeImage($post_id, $fields->get('image'));
+			}
+
 			$recipe = $this->getRecipeDetails(['id' => $post_id]);
 
 			return collect(['data' => collect($recipe), 'errors' => collect([])]);
 		}
 
 		return collect(['data' => collect([]), 'errors' => collect(['message' => __('Invalid save', 'cws-tools')])]);
+	}
+
+	/**
+	 * Saves post featured image
+	 * 
+	 * @param [Integer] $post_id
+	 * @param [String] $image_url
+	 * @return [array] $response
+	 */
+	public function saveRecipeImage($post_id, $image_url)
+	{	
+		require_once ABSPATH . 'wp-admin/includes/file.php';
+    	require_once ABSPATH . 'wp-admin/includes/media.php';
+    	require_once ABSPATH . 'wp-admin/includes/image.php';
+
+		$response = ['data' => [], 'errors' => []];
+
+		$file_name = basename(parse_url($image_url, PHP_URL_PATH));
+
+	    // Download the image to a temporary location
+	    $temp_file = download_url($image_url);
+
+	    // removing white space
+		$fileName = preg_replace('/\s+/', '-', $file_name);
+
+		// removing special characters
+		$fileName = preg_replace('/[^A-Za-z0-9.\-]/', '', $fileName);
+
+		// upload file
+		$upload = wp_upload_bits($fileName, null, file_get_contents($temp_file));
+
+		if (isset($upload['error']) && !empty($upload['error'])) {
+			$response['errors']['image'] = $upload['error'] ?? __('An error occurred while uploading the image. Please try again.',  'cws-tools');
+		} elseif (isset($upload['file'])) {
+			$params['guid'] 			= $upload['url'];
+			$params['post_mime_type'] 	= $upload['type'];
+
+			// Insert the attachment.
+			$attach_id = wp_insert_attachment($params, $upload['file'], 0);
+
+			if (is_numeric($attach_id)) {
+		        if (!function_exists('wp_generate_attachment_metadata')) {
+	        		// Make sure that this file is included, as wp_generate_attachment_metadata() depends on it.
+	        		require_once ABSPATH . 'wp-admin/includes/image.php';
+	        	}
+
+	        	// Generate the metadata for the attachment, and update the database record.
+			    $metas['_wp_attachment_metadata'] = wp_generate_attachment_metadata($attach_id, $upload['file']);
+			    foreach ($metas as $_key => $value) {
+			        update_post_meta($attach_id, $_key, $value);
+			    }
+
+			    set_post_thumbnail($post_id, $attach_id);
+		    }
+		}
+
+		return $response;
 	}
 }
