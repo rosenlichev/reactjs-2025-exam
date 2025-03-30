@@ -55,4 +55,37 @@ abstract class CwsAbstractBaseApiService
         wp_send_json($data, $status ?? 200);
         die();
     }
+
+    /**
+     * Check for a valid Bearer token in the Authorization header.
+     */
+    public function check_bearer_token($request)
+    { 
+        $headers = $request->get_headers();
+        $auth    = isset($headers['authorization'][0]) ? $headers['authorization'][0] : '';
+
+        // site_log(print_r($headers, 1) , "headers: ");
+        // site_log($auth , "auth: ");
+
+        if (strpos($auth, 'Bearer ') !== false) {
+            $token = trim(str_replace('Bearer', '', $auth));
+
+            $verify_token = $this->verify_token($token);
+        }
+
+        if (!$verify_token) {
+            site_log(trim($token), "Call with invalid or missing Token");
+        }
+
+        return $verify_token ?? false;
+    }
+
+    /**
+     * A hypothetical function to verify the Bearer token.
+     * Implement according to your token validation logic.
+     */
+    public function verify_token($token)
+    {
+        return get_current_user_id() > 0;
+    }
 }

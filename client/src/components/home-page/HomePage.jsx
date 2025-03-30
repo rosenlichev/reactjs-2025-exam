@@ -6,9 +6,7 @@ import HomepageListItem from "./homepage-list-item/HomepageListItem";
 
 export default function HomePage() {
     const {recipes} = useHomepageRecipes();
-    // const {email} = useContext(UserContext);
-
-    // console.log(email);
+    
     return (
         <>
             <div className="page-wrapper home">

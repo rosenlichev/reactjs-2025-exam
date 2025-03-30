@@ -1,8 +1,10 @@
 import parse from 'html-react-parser';
 import { Link, useNavigate, useParams } from "react-router";
 import { useRecipe } from "../../stores/recipeStore";
+import useAuth from '../../hooks/useAuth';
 
 export default function RecipeDetails() {
+    const { isAuthenticated } = useAuth();
     const { id } = useParams();
     const { recipe } = useRecipe(id);
 
@@ -12,8 +14,14 @@ export default function RecipeDetails() {
                 <section>
                     {recipe && (
                     <>    
-                            <h1 className="title-decoration mb-10 text-6xl font-roboto-mono-italic text-center text-black">{recipe.name}</h1>
+                            <h1 className="relative title-decoration mb-10 text-6xl font-roboto-mono-italic text-center text-black">
+                                {recipe.name}
 
+                                {isAuthenticated === true && (
+                                    <Link to={`/recipe-edit/${recipe.id}`} className="absolute right-0 bottom-6 p-2 text-sm text-white rounded" style={{backgroundColor: '#03835a'}}>Edit recipe</Link>
+                                )}
+                            </h1>
+                            
                             {(recipe.preparationTime !== '' || recipe.servings !== '' || recipe.categories.length > 0) && (
                                 <div className="recipe-info flex flex-col">
                                     {(recipe.preparationTime !== '' || recipe.servings !== '') && (

@@ -11,6 +11,13 @@ class CwsRecipeApiRoutes extends CwsAbstractBaseApiService
             'permission_callback' => '__return_true'
         ]);
 
+        register_rest_route($this->namespace, 'getMyRecipes', [
+            'methods'             => 'POST',
+            'callback'            => [$this, 'cwsToolsGetMyRecipes'],
+            'args'                => [],
+            'permission_callback' => [$this, 'check_bearer_token']
+        ]);
+
         register_rest_route($this->namespace, 'getRecipesHomepage', [
             'methods'             => 'POST',
             'callback'            => [$this, 'cwsToolsGetRecipesHomepage'],
@@ -29,14 +36,14 @@ class CwsRecipeApiRoutes extends CwsAbstractBaseApiService
             'methods'             => 'POST',
             'callback'            => [$this, 'cwsToolsSaveOrUpdateRecipe'],
             'args'                => [],
-            'permission_callback' => '__return_true'
+            'permission_callback' => [$this, 'check_bearer_token']
         ]);
 
         register_rest_route($this->namespace, 'addComment', [
             'methods'             => 'POST',
             'callback'            => [$this, 'cwsToolsAddComment'],
             'args'                => [],
-            'permission_callback' => '__return_true'
+            'permission_callback' => [$this, 'check_bearer_token']
         ]);
 	}
 
@@ -50,6 +57,25 @@ class CwsRecipeApiRoutes extends CwsAbstractBaseApiService
 		$response = $recipes;
 
 		$this->api_send_json('getRecipes', $response ?? [], $status ?? 200);
+	}
+
+
+	public function cwsToolsGetMyRecipes(WP_REST_Request $request)
+	{
+		$_params 	= $request->get_json_params();
+		$params 	= [];
+
+		if (is_user_logged_in()) {
+			$params['author'] = get_current_user_id();
+
+			$recipes = (new CwsRecipeService)->getRecipes($params);
+
+			$response = $recipes;
+		} else {
+			$response = [];
+		}
+
+		$this->api_send_json('getMyRecipes', $response ?? [], $status ?? 200);
 	}
 
 	public function cwsToolsGetRecipesHomepage(WP_REST_Request $request)
@@ -85,8 +111,24 @@ class CwsRecipeApiRoutes extends CwsAbstractBaseApiService
 
 	public function cwsToolsSaveOrUpdateRecipe(WP_REST_Request $request)
 	{
-		$_params = $request->get_json_params();
-		$params = [];
+		$params = $request->get_json_params();
+
+		$CwsRecipeService = new CwsRecipeService();
+		$CwsRecipeService->setVars($params);
+
+		$responseData = $CwsRecipeService->saveOrUpdateRecipe();
+
+		if ($responseData->has('errors') && $responseData->get('errors')->isNotEmpty()) {
+
+            $response   = ['message' => $responseData->get('errors')->first()];
+            $status     = 400;
+
+            $this->api_send_json('registerUser', $response, $status ?? 200);
+            die();
+
+        } else {
+            $response = $responseData->get('data');
+        }
 
 		$this->api_send_json('saveOrUpdateRecipe', $response ?? [], $status ?? 200);
 	}

@@ -249,11 +249,11 @@ header {
       font-optical-sizing: auto;
       font-weight: 500;
       font-style: normal; }
-    .auth form div input {
+    .auth form div input, .auth form div textarea {
       padding: 10px;
       border-radius: 6px;
       border: 1px solid #cacaca; }
-      .auth form div input:focus, .auth form div input:focus-within {
+      .auth form div input:focus, .auth form div input:focus-within, .auth form div textarea:focus, .auth form div textarea:focus-within {
         outline: none;
         border-color: var(--app-color-secondary); }
   .auth form button {

@@ -1,6 +1,9 @@
 import { Link } from "react-router";
+import useAuth from "../../hooks/useAuth";
 
 export default function HeaderHomepage() {
+    const { isAuthenticated } = useAuth();
+
     return (
         <header className="header-homepage w-full absolute top-0 left-0 z-1">
             <div className="w-full py-4 flex items-center justify-evenly">
@@ -14,10 +17,20 @@ export default function HeaderHomepage() {
                     <span className="text-2xl font-roboto-mono text-white">Stay Healthy</span>
                 </div>
 
-                <nav className="flex items-center gap-4">
-                    <Link to="/login" className="text-3xl font-roboto-condensed text-white">Login</Link>
-                    <Link to="/register" className="text-3xl font-roboto-condensed text-white">Register</Link>
-                </nav>
+                {isAuthenticated === false && (
+                    <nav className="flex items-center gap-4">
+                        <Link to="/login" className="text-3xl font-roboto-condensed text-white">Login</Link>
+                        <Link to="/register" className="text-3xl font-roboto-condensed text-white">Register</Link>
+                    </nav>
+                )}
+
+                {isAuthenticated === true && (
+                    <nav className="flex items-center gap-4">
+                        <Link to="/dashboard" className="text-3xl font-roboto-condensed text-white">Dashboard</Link>
+                        <Link to="/my-recipes" className="text-3xl font-roboto-condensed text-white">My Recipes</Link>
+                        <Link to="/logout" className="text-3xl font-roboto-condensed text-white">Logout</Link>
+                    </nav>
+                )}
             </div>
         </header>
     );

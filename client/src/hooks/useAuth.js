@@ -9,7 +9,7 @@ export default function useAuth() {
         const authOptions = {
             ...options,
             headers: {
-                'X-Authorization': authData.token,
+                'Authorization': `Bearer ${token}`,
                 ...options.headers
             }
         };

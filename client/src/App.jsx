@@ -1,4 +1,6 @@
 import { BrowserRouter, Routes, Route, useLocation } from 'react-router-dom';
+import { useContext } from 'react';
+import { UserContext } from './contexts/UserContext';
 
 import UserProvider from './providers/UserProvider'
 
@@ -13,10 +15,12 @@ import RecipesList from './components/recipe-list/RecipeList'
 import RecipeDetails from './components/recipe-details/RecipeDetails'
 import Login from './components/login/Login';
 import Register from './components/register/Register';
+import Logout from './components/logout/Logout';
 import Dashboard from './components/dashboard/Dashboard';
+import MyRecipes from './components/my-recipes/MyRecipes';
+import RecipeCreate from './components/recipe-create/RecipeCreate';
+import RecipeEdit from './components/recipe-edit/RecipeEdit';
 import './App.css'
-import { useContext } from 'react';
-import { UserContext } from './contexts/UserContext';
 
 const HeaderSelector = () => {
   const location = useLocation();
@@ -40,6 +44,13 @@ function App() {
               <Route path="/recipe/:id" element={<RecipeDetails />} />
 
               <Route path="/dashboard" element={<Dashboard />} />
+
+              <Route element={<AuthGuard />}>
+                  <Route path="/my-recipes" element={<MyRecipes />} />
+                  <Route path="/recipe-create" element={<RecipeCreate />} />
+                  <Route path="/recipe-edit/:id" element={<RecipeEdit />} />
+                  <Route path="/logout" element={<Logout />} />
+              </Route>
 
               <Route element={<GuestGuard />}>
                   <Route path="/login" element={<Login />} />

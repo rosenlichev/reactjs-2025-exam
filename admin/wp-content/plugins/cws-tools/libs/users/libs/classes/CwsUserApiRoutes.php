@@ -50,18 +50,24 @@ class CwsUserApiRoutes extends CwsAbstractBaseApiService
             ]
         ]);
 
+        register_rest_route($this->namespace, 'logoutUser', [
+            'methods'             => 'POST',
+            'callback'            => [$this, 'cwsToolsLogoutUser'],
+            'permission_callback' => [$this, 'check_bearer_token']
+        ]);
+
         register_rest_route($this->namespace, 'getUser', [
             'methods'             => 'POST',
             'callback'            => [$this, 'cwsToolsGetUser'],
             'args'                => [],
-            'permission_callback' => '__return_true'
+            'permission_callback' => [$this, 'check_bearer_token']
         ]);
 
         register_rest_route($this->namespace, 'updateUser', [
             'methods'             => 'POST',
             'callback'            => [$this, 'cwsToolsUpdateUser'],
             'args'                => [],
-            'permission_callback' => '__return_true'
+            'permission_callback' => [$this, 'check_bearer_token']
         ]);
 	}
 
@@ -108,6 +114,13 @@ class CwsUserApiRoutes extends CwsAbstractBaseApiService
         __sd($response, 'cwsLoginUser');
 
         $this->api_send_json('loginUser', $response ?? [], $status ?? 200);
+    }
+
+    public function cwsToolsLogoutUser(WP_REST_Request $request)
+    {
+        $response = [];
+
+        $this->api_send_json('logoutUser', $response, $status ?? 200);
     }
 
     public function cwsToolsGetUser(WP_REST_Request $request)
