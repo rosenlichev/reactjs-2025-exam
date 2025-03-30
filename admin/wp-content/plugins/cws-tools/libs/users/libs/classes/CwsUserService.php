@@ -234,4 +234,43 @@ class CwsUserService extends CwsBaseService
 
 		return implode(' ', $name_array);
 	}
+
+    /**
+ * Manage a user's wishlist by adding or removing post IDs
+ * 
+ * @param int    $user_id The user ID
+ * @param int    $post_id The post ID to add or remove
+ * @param string $mode    Action to perform: 'add' or 'delete'
+ * @return bool  True on success, false on failure
+ */
+function manageUserWishlist($user_id, $post_id, $mode = 'add') {
+    // Validate parameters
+    if (!$user_id || !$post_id) {
+        return false;
+    }
+    
+    // Sanitize inputs
+    $user_id = absint($user_id);
+    $post_id = absint($post_id);
+    $mode = in_array($mode, ['add', 'delete']) ? $mode : 'add';
+    
+    // Get current wishlist
+    $wishlist = get_user_meta($user_id, 'wishlist', false);
+    
+    // Handle add mode
+    if ($mode === 'add') {
+        // Check if post is already in wishlist to avoid duplicates
+        if (!in_array($post_id, $wishlist)) {
+            return add_user_meta($user_id, 'wishlist', $post_id);
+        }
+        return true; // Already in wishlist
+    }
+    
+    // Handle delete mode
+    if ($mode === 'delete') {
+        return delete_user_meta($user_id, 'wishlist', $post_id);
+    }
+    
+    return false;
+}
 }

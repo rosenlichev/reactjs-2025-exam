@@ -53,6 +53,29 @@ export const useRecipe = (id) => {
     return { recipe };
 }
 
+export const useSetLiked = () => {
+    const [recipe, setRecipe] = useState([]);
+    const { token } = useContext(UserContext);
+
+    const headers = {
+        'Authorization': `Bearer ${token}`,
+    };
+
+    // Return a function that can be called from event handlers
+    const setLikedFn = async (data) => {
+        try {
+            const result = await request.apiRequestSimple(`${baseUrl}/setLiked`, data, headers);
+            setRecipe(result);
+            return result;
+        } catch (error) {
+            console.error("Error setting liked status:", error);
+            throw error;
+        }
+    };
+
+    return setLikedFn;
+};
+
 export const useCreateRecipe = (data) => {
 
     const { token } = useContext(UserContext);

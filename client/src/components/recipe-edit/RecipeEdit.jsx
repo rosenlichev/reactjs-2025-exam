@@ -7,12 +7,20 @@ export default function RecipeEdit() {
     const navigate = useNavigate();
     const [message, setMessage] = useState("");
     const [isError, setIsError] = useState(false);
+    const [imagePreview, setImagePreview] = useState(null);
     const {createRecipe} = useCreateRecipe();
     const { id } = useParams();
     const { recipe } = useRecipe(id);
 
     const handleChange = (event) => {
 
+    };
+
+    const handleImageChange = (event) => {
+        const file = event.target.files[0];
+        if (file) {
+            setImagePreview(URL.createObjectURL(file));
+        }
     };
 
     const handleSubmit = async (event) => {
@@ -49,7 +57,7 @@ export default function RecipeEdit() {
             <div className="page-wrapper">
                 <section>
                     <h1 className="title-decoration mb-10 text-6xl font-roboto-mono-italic text-center text-black">
-                        New Recipe
+                        Edit Recipe - {recipe.name}
                     </h1>
                     <section className="auth">
                         <form id="create" onSubmit={handleSubmit}>
@@ -91,20 +99,37 @@ export default function RecipeEdit() {
                                 <label htmlFor="preparation">Preparation</label>
                                 <textarea id="preparation" name="preparation" defaultValue={recipe.preparation ?? ''} onChange={handleChange}></textarea>
                             </div>
-                           {recipe.ingredients && (
-                             <div className="flex flex-col gap-2">
-                                <label>Ingredients</label>
-                                {[...Array(10)].map((_, index) => (
-                                    <input
-                                        key={index} 
-                                        id={`ingredient-${index}`}
-                                        type="text" 
-                                        name="ingredients[]"
-                                        defaultValue={recipe.ingredients[index] ?? ''}
-                                    />
-                                ))}
+                            <div className="flex flex-col gap-2">
+                                <label htmlFor="name">Name</label>
+                                <input type="text" id="name" name="name" defaultValue={recipe.name ?? ''} onChange={handleChange} />
                             </div>
-                           )}
+
+                            <div className="flex flex-col gap-2">
+                                <label htmlFor="name">Recipe image (Full url)</label>
+                                <input type="text" name="image" onChange={handleImageChange}  />
+                            </div>
+
+                            {/* Show Image Preview */}
+                            {imagePreview && (
+                                <div className="mt-2">
+                                    <img src={imagePreview} alt="Preview" className="w-32 h-32 object-cover rounded-md" />
+                                </div>
+                            )}
+
+                            {recipe.ingredients && (
+                                <div className="flex flex-col gap-2">
+                                    <label>Ingredients</label>
+                                    {[...Array(10)].map((_, index) => (
+                                        <input
+                                            key={index} 
+                                            id={`ingredient-${index}`}
+                                            type="text" 
+                                            name="ingredients[]"
+                                            defaultValue={recipe.ingredients[index] ?? ''}
+                                        />
+                                    ))}
+                                </div>
+                            )}
 
                             {message !== '' && (
                                 <>

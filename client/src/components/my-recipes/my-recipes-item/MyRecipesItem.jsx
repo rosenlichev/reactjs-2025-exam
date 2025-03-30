@@ -1,4 +1,5 @@
 import { Link } from 'react-router'
+import LikeButton from '../../like-button/LikeButton';
 
 export default function MyRecipesItem({
     recipe
@@ -28,9 +29,10 @@ export default function MyRecipesItem({
                             )}
                         </div>
                         <div className="post-comment-share-area flex">
-                            <div className="post-favourite">
+                            <LikeButton  recipe={recipe} />
+                            {/* <div className="post-favourite">
                                 <div className="hover:text-black"><i className="far fa-heart" aria-hidden="true"></i> {recipe.liked}</div>
-                            </div>
+                            </div> */}
                             <div className="post-comments">
                                 <div className="hover:text-black"><i className="far fa-comment-alt" aria-hidden="true"></i> {recipe.comments}</div>
                             </div>

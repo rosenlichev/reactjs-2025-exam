@@ -45,6 +45,13 @@ class CwsRecipeApiRoutes extends CwsAbstractBaseApiService
             'args'                => [],
             'permission_callback' => [$this, 'check_bearer_token']
         ]);
+
+        register_rest_route($this->namespace, 'setLiked', [
+            'methods'             => 'POST',
+            'callback'            => [$this, 'cwsToolsSetLiked'],
+            'args'                => [],
+            'permission_callback' => [$this, 'check_bearer_token']
+        ]);
 	}
 
 	public function cwsToolsGetRecipes(WP_REST_Request $request)
@@ -127,10 +134,6 @@ class CwsRecipeApiRoutes extends CwsAbstractBaseApiService
             die();
 
         } else {
-        	if (!empty($_FILES) && $responseData->get('data')->has('id')) {
-        		$post_id = $responseData->get('data')->get('id');
-        		$CwsRecipeService->saveRecipeImage($post_id, $_FILES);
-        	}
 
             $response = $responseData->get('data');
         }
@@ -142,6 +145,36 @@ class CwsRecipeApiRoutes extends CwsAbstractBaseApiService
 	{
 		$_params = $request->get_json_params();
 		$params = [];
+
+		$this->api_send_json('addComment', $response ?? [], $status ?? 200);
+	}
+
+	public function cwsToolsSetLiked(WP_REST_Request $request)
+	{
+		$params = $request->get_json_params();
+
+		$CwsRecipeService = new CwsRecipeService();
+		$CwsUserService = new CwsUserService();
+
+		$user_id 	= get_current_user_id();
+		$post_id 	= $params['id'] ?? 0;
+		$mode 		= $params['mode'] ?? 'add';
+
+		$manageWishlist = $CwsUserService->manageUserWishlist($user_id, $post_id, $mode);
+
+		if ($manageWishlist) {
+			$recipe = $CwsRecipeService->getRecipeDetails($params);
+
+        	$response = $recipe;
+
+			$this->api_send_json('getRecipeDetails', $response ?? [], $status ?? 200);
+		} else {
+			$response   = ['message' => __('Invalid action', 'cws-tools')];
+            $status     = 400;
+
+            $this->api_send_json('setLiked', $response, $status ?? 200);
+            die();
+		}
 
 		$this->api_send_json('addComment', $response ?? [], $status ?? 200);
 	}

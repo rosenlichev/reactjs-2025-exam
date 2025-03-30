@@ -65,6 +65,19 @@ class CwsRecipeService extends CwsBaseService
 					}
 				}
 
+				if (is_user_logged_in()) {
+					$user_id = get_current_user_id();
+					$wishlist = get_user_meta($user_id, 'wishlist', false);
+
+					if (is_array($wishlist)) {
+						if (in_array($post->ID, $wishlist)) {
+							$prepareRecipe['liked'] = 1;
+						}
+					} else if ($post->ID == $wishlist) {
+						$prepareRecipe['liked'] = 1;
+					}
+				}
+
 				$recipes[] = $prepareRecipe;
 			}
 		}
@@ -75,8 +88,6 @@ class CwsRecipeService extends CwsBaseService
 	public function getRecipeDetails($params = []): Collection
 	{
 		$recipe = [];
-
-		__sd($params, "GET RECIPE DETAILS");
 
 		if (isset($params['id']) && $params['id'] != '') {
 			$post = get_post($params['id']);
@@ -140,6 +151,19 @@ class CwsRecipeService extends CwsBaseService
 							'id' 	=> $term->term_id,
 							'name' 	=> $term->name
 						];
+					}
+				}
+
+				if (is_user_logged_in()) {
+					$user_id = get_current_user_id();
+					$wishlist = get_user_meta($user_id, 'wishlist', false);
+
+					if (is_array($wishlist)) {
+						if (in_array($post->ID, $wishlist)) {
+							$recipe['liked'] = 1;
+						}
+					} else if ($post->ID == $wishlist) {
+						$recipe['liked'] = 1;
 					}
 				}
 			}
