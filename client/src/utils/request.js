@@ -1,5 +1,6 @@
-const request = async (headers, data, url ) => {
-    const options = {
+const requestSimple = async (url, data = {}, headers = {}, options = {} ) => {
+    options = {
+        ...options,
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
@@ -15,6 +16,22 @@ const request = async (headers, data, url ) => {
     return result;
 };
 
+const request = async (url, data = {}, headers = {} ) => {
+    const options = {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            ...headers,
+        },
+        body: JSON.stringify({...data})
+    }
+
+    const response = await fetch(url, options);
+
+    return response;
+};
+
 export default {
+    apiRequestSimple: requestSimple,
     apiRequest: request,
 }

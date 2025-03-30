@@ -1,9 +1,13 @@
 <?php
 
+use Illuminate\Support\Collection;
+
 class CwsUserService extends CwsBaseService
 {
 	public $user_id         = null;
     public $user_data       = null;
+    private $jwtAuth        = 'jwt-aut';
+    private $jwtAuthVersion = '1.3.6';
 
     public function __construct($user_id = null)
     {
@@ -34,6 +38,44 @@ class CwsUserService extends CwsBaseService
         return $response;
 	}
 
+    public function loginUser($request)
+    {
+        $user     = new Collection();
+        $response = new Collection();
+        $data     = new Collection();
+
+        if (!$request->has('email') || !$request->has('password')) {
+
+            $response->put('errors', collect(["error" => __('Invalid email or password', 'cws-tools')]));
+
+            return $response;
+        }
+
+        $user = wp_authenticate($request->get('email'), $request->get('password'));
+
+        if (is_wp_error($user)) {
+
+            $response->put('errors', collect(["error" => $user->get_error_message()]));
+
+            return $response;
+        }
+
+        $_user = $this->getUser($user->ID);
+
+        $data->put('id', $_user->get('ID'));
+        $data->put('token', $_user->get('token'));
+        $data->put('email', $_user->get('user_email'));
+        $data->put('display_name', $_user->get('display_name'));
+        $data->put('first_name', $_user->get('meta')->get('first_name'));
+        $data->put('last_name', $_user->get('meta')->get('last_name'));
+        $data->put('message', __('Successfull login', 'cws-tools'));
+        $data->put('errors', collect());
+
+        $response->put('data', $data);
+
+        return $response;
+    }
+
 	public function setFields()
     {
         $fields     = new Collection();
@@ -57,6 +99,14 @@ class CwsUserService extends CwsBaseService
                 $errors->put('email', 'Email already exists');
             }
         } else {
+            if (!$fields->has('first_name') || strlen($fields->get('first_name')) < 2) {
+                $errors->put('first_name', __('First name must be at least 2 characters long', 'cws-tools'));
+            }
+
+            if (!$fields->has('last_name') || strlen($fields->get('last_name')) < 2) {
+                $errors->put('last_name', __('Last name must be at least 2 characters long', 'cws-tools'));
+            }
+
             if (!$fields->has('email') || !filter_var($fields->get('email'), FILTER_VALIDATE_EMAIL)) {
                 $errors->put('email', __('Invalid email address', 'cws-tools'));
             } elseif (email_exists($fields->get('email')) > 0) {
@@ -109,11 +159,11 @@ class CwsUserService extends CwsBaseService
 
         $response->put('id', $_user->get('ID'));
         $response->put('token', $_user->get('token'));
-        $response->put('user_email', $_user->get('user_email'));
-        $response->put('nice_name', $_user->get('user_nicename'));
+        $response->put('email', $_user->get('user_email'));
         $response->put('display_name', $_user->get('display_name'));
-        $response->put('first_name', $_user->get('first_name'));
-        $response->put('last_name', $_user->get('last_name'));
+        $response->put('first_name', $_user->get('meta')->get('first_name'));
+        $response->put('last_name', $_user->get('meta')->get('last_name'));
+        $response->put('message', __('Successfull registration', 'cws-tools'));
         $response->put('errors', collect());
 
         return $response;
@@ -152,7 +202,7 @@ class CwsUserService extends CwsBaseService
             site_log($token->errors);
 
             return collect(['data' => collect([]), 'errors' => collect([
-                'message' => 'wrong data. Please reset your password'
+                'message' => __('Wrong data. Please reset your password.', 'cws-tools')
             ])]);
         }
 
@@ -160,18 +210,9 @@ class CwsUserService extends CwsBaseService
             $_user       = $user->data;
             $user->token = $token['token'];
         }
-        $user->user_role = $simplifiedUserMeta['user_role'] ?? _ROLE::PERSONAL;
-        $user->meta      = collect($simplifiedUserMeta);
 
-        if (isset($simplifiedUserMeta['birth_date']) && !empty($simplifiedUserMeta['birth_date'])) {
-            $birthDate = new DateTime($simplifiedUserMeta['birth_date']);
-            $today     = new DateTime('now');
-            $interval  = $today->diff($birthDate);
-            $age       = $interval->y . ' years';
-            $ageN      = $interval->y;
-        }
-        $user->age  = $age ?? '';
-        $user->ageN = $ageN ?? '0'; 
+        $user->meta = collect($simplifiedUserMeta);
+
         return collect($_user);
     }
 

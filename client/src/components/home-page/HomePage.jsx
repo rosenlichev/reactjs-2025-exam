@@ -1,10 +1,14 @@
+import { useContext } from "react";
 import { useHomepageRecipes } from "../../stores/recipeStore";
+import { UserContext } from "../../contexts/UserContext";
 import Banner from "./banner/Banner";
 import HomepageListItem from "./homepage-list-item/HomepageListItem";
 
 export default function HomePage() {
     const {recipes} = useHomepageRecipes();
+    // const {email} = useContext(UserContext);
 
+    // console.log(email);
     return (
         <>
             <div className="page-wrapper home">

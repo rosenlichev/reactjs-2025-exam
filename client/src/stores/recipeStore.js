@@ -7,7 +7,7 @@ export const useRecipes = () => {
     const [recipes, setRecipes] = useState([]);
 
     useEffect(() => {
-        request.apiRequest({}, {}, `${baseUrl}/getRecipes`)
+        request.apiRequestSimple(`${baseUrl}/getRecipes`)
             .then(setRecipes);
     }, []);
 
@@ -18,7 +18,7 @@ export const useHomepageRecipes = () => {
     const [recipes, setRecipes] = useState([]);
 
     useEffect(() => {
-        request.apiRequest({}, {}, `${baseUrl}/getRecipesHomepage`)
+        request.apiRequestSimple(`${baseUrl}/getRecipesHomepage`)
             .then(setRecipes);
     }, []);
 
@@ -29,7 +29,7 @@ export const useRecipe = (id) => {
     const [recipe, setRecipe] = useState([]);
 
     useEffect(() => {
-        request.apiRequest({}, {id: id}, `${baseUrl}/getRecipeDetails`)
+        request.apiRequestSimple(`${baseUrl}/getRecipeDetails`, {id: id})
             .then(setRecipe);
     }, []);
 

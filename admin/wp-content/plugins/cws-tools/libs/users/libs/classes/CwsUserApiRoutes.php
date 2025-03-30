@@ -77,11 +77,11 @@ class CwsUserApiRoutes extends CwsAbstractBaseApiService
             $response   = ['message' => $responseData->get('errors')->first()];
             $status     = 400;
 
-            $this->api_send_json('registerUser', $data, $status ?? 200);
+            $this->api_send_json('registerUser', $response, $status ?? 200);
             die();
 
         } else {
-            $response     = $responseData->get('data');
+            $response = $responseData->get('data');
         }
 
         $this->api_send_json('registerUser', $response ?? [], $status ?? 200);
@@ -89,8 +89,23 @@ class CwsUserApiRoutes extends CwsAbstractBaseApiService
 
     public function cwsToolsLoginUser(WP_REST_Request $request)
     {
-        $_params = $request->get_json_params();
-        $params = [];
+        $cwsUserService = new CwsUserService();
+
+        $responseData = $cwsUserService->loginUser(collect($request->get_json_params()));
+
+        if ($responseData->has('errors') && $responseData->get('errors')->isNotEmpty()) {
+
+            $response   = ['message' => $responseData->get('errors')->first()];
+            $status     = 400;
+
+            $this->api_send_json('loginUser', $response, $status ?? 200);
+            die();
+
+        } else {
+            $response = $responseData->get('data');
+        }
+
+        __sd($response, 'cwsLoginUser');
 
         $this->api_send_json('loginUser', $response ?? [], $status ?? 200);
     }

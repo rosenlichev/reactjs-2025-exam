@@ -6,6 +6,9 @@ define("CWS_TOOLS_ASSETS", plugin_dir_url(__FILE__) . 'assets');
 define("CWS_TOOLS_ABSPATH_ASSETS", plugin_dir_url(__FILE__) . '/assets');
 define("CWS_TOOLS_ABSPATH_TEMPLATE", dirname(__FILE__) . '/templates');
 
+// plugin: JWT Authentication for WP REST API
+define('JWT_AUTH_SECRET_KEY', 'cws_tools_secret_key');
+
 require dirname(__FILE__) . '/libs/vendor/autoload.php';
 
 // Hooks & Functions

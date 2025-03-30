@@ -6,8 +6,6 @@ export default function RecipeDetails() {
     const { id } = useParams();
     const { recipe } = useRecipe(id);
 
-    console.log(recipe);
-
     return (
         <>
             <div className="page-wrapper">
