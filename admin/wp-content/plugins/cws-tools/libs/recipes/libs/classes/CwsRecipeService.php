@@ -66,8 +66,14 @@ class CwsRecipeService extends CwsBaseService
 					}
 				}
 
+				$comments = get_comments([
+					'post_id' 	=> $post->ID,
+					'status' 	=> 'approve',
+					'order' 	=> 'ASC'
+				]);
+
 				if (!empty($comments) && !is_wp_error($comments)) {
-					$recipe['comments_count'] = count($comments);
+					$prepareRecipe['comments_count'] = count($comments);
 				}
 
 				if (is_user_logged_in()) {
