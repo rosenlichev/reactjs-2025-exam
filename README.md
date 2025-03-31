@@ -20,3 +20,13 @@ admin
 
 Password:
 Admin@reactjs2025
+
+
+Test users for the app:
+tester+alan@cobweb.biz
+tester+john@cobweb.biz
+tester+luke@cobweb.biz
+tester+maxwell@cobweb.biz
+
+Password:
+123456
