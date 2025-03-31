@@ -17,7 +17,7 @@ export default function HeaderHomepage() {
                     <span className="text-2xl font-roboto-mono text-white">Stay Healthy</span>
                 </div>
 
-                {isAuthenticated === false && (
+                {(isAuthenticated === false || isAuthenticated === undefined) && (
                     <nav className="flex items-center gap-4">
                         <Link to="/login" className="text-3xl font-roboto-condensed text-white">Login</Link>
                         <Link to="/register" className="text-3xl font-roboto-condensed text-white">Register</Link>

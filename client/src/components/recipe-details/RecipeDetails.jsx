@@ -2,6 +2,7 @@ import parse from 'html-react-parser';
 import { Link, useNavigate, useParams } from "react-router";
 import { useRecipe } from "../../stores/recipeStore";
 import useAuth from '../../hooks/useAuth';
+import Comments from '../comments/Comments';
 
 export default function RecipeDetails() {
     const { isAuthenticated } = useAuth();
@@ -18,7 +19,7 @@ export default function RecipeDetails() {
                                 {recipe.name}
 
                                 {isAuthenticated === true && (
-                                    <Link to={`/recipe-edit/${recipe.id}`} className="absolute right-0 bottom-6 p-2 text-sm text-white rounded" style={{backgroundColor: '#03835a'}}>Edit recipe</Link>
+                                    <Link to={`/recipe-edit/${recipe.id}`} className="absolute right-0 bottom-[-45px] p-2 text-sm text-white rounded" style={{backgroundColor: '#03835a'}}>Edit recipe</Link>
                                 )}
                             </h1>
                             
@@ -100,6 +101,8 @@ export default function RecipeDetails() {
                                     </>
                                 )}
                             </section>
+
+                            <Comments recipe_id={recipe.id} comments={recipe.comments} />
                         </>  
                     )}
                 </section>

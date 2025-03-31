@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useSetLiked } from "../../stores/recipeStore";
 
 export default function LikeButton({recipe}) {
+    const [currentRecipe, setCurrentRecipe] = useState(recipe ?? {});
     const [liked, setLiked] = useState(recipe.liked ?? false);
     const setLikedAPI = useSetLiked();
 
@@ -17,6 +18,7 @@ export default function LikeButton({recipe}) {
         console.log(responseData);
 
         if (responseData.id > 0) {
+            setCurrentRecipe(responseData);
             setLiked(true);
         }
     }
@@ -25,6 +27,7 @@ export default function LikeButton({recipe}) {
         const responseData = await setLikedAPI({id: id, mode: 'delete'});
 
         if (responseData.id > 0) {
+            setCurrentRecipe(responseData);
             setLiked(false);
         }
     }
@@ -33,13 +36,13 @@ export default function LikeButton({recipe}) {
         <>
             {(liked === false || liked === 0) && (
                 <div className="post-favourite" onClick={() => handleAddClick(recipe.id)}>
-                    <div className="hover:text-black"><i className="far fa-heart" aria-hidden="true"></i> {recipe.liked}</div>
+                    <div className="hover:text-black"><i className="far fa-heart" aria-hidden="true"></i> {currentRecipe.liked_count}</div>
                 </div>
             )}
 
             {(liked === true || liked === 1) && (
                 <div className="post-favourite" onClick={() => handleDeleteClick(recipe.id)}>
-                    <div className="hover:text-black"><i className="fas fa-heart" aria-hidden="true"></i> {recipe.liked}</div>
+                    <div className="hover:text-black"><i className="fas fa-heart" aria-hidden="true"></i> {currentRecipe.liked_count}</div>
                 </div>
             )}
             

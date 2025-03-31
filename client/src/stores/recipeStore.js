@@ -5,18 +5,29 @@ import { UserContext } from "../contexts/UserContext";
 const baseUrl = "http://dev200.cobweb.work:82/reactjs-2025-exam/admin/wp-json/cws-tools/v1";
 
 export const useRecipes = () => {
+    const { token } = useContext(UserContext);
     const [recipes, setRecipes] = useState([]);
 
     useEffect(() => {
-        request.apiRequestSimple(`${baseUrl}/getRecipes`)
+        if (token) {
+            const headers = {
+                'Authorization': `Bearer ${token}`,
+            }
+
+            request.apiRequestSimple(`${baseUrl}/getRecipes`, null, headers)
             .then(setRecipes);
+        } else {
+            request.apiRequestSimple(`${baseUrl}/getRecipes`)
+            .then(setRecipes);
+        }
+        
     }, []);
 
     return { recipes };
 }
 
 export const useMyRecipes = () => {
-    const { token } = useContext(UserContext)
+    const { token } = useContext(UserContext);
     const [recipes, setRecipes] = useState([]);
 
     useEffect(() => {
@@ -29,6 +40,41 @@ export const useMyRecipes = () => {
     }, []);
 
     return { recipes };
+}
+
+// export const useAddComment = (data) => {
+//     const { token } = useContext(UserContext);
+//     const [recipe, setRecipe] = useState([]);
+
+//     useEffect(() => {
+//         const headers = {
+//             'Authorization': `Bearer ${token}`,
+//         }
+
+//         request.apiRequestSimple(`${baseUrl}/getMyRecipes`, data, headers)
+//             .then(setRecipe);
+//     }, []);
+
+//     return {
+//         recipe
+//     };
+// }
+
+
+export const  useAddComment = () => {
+    const { token } = useContext(UserContext);
+
+    const addComment = (data) => {
+        const headers = {
+            'Authorization': `Bearer ${token}`,
+        }
+
+        return request.apiRequest(`${baseUrl}/addComment`, data, headers);
+    }
+
+    return {
+        addComment,
+    };
 }
 
 export const useHomepageRecipes = () => {

@@ -4,6 +4,8 @@ import useAuth from "../../hooks/useAuth";
 export default function Header() {
     const { isAuthenticated } = useAuth();
 
+    console.log(isAuthenticated);
+
     return (
         <header className="header-inner w-full">
             <div className="w-full py-4 flex items-center justify-evenly">
@@ -17,7 +19,7 @@ export default function Header() {
                     <span className="text-2xl font-roboto-mono text-black">Stay Healthy</span>
                 </div>
                 
-                {isAuthenticated === false && (
+                {(isAuthenticated === false || isAuthenticated === undefined) && (
                     <nav className="flex items-center gap-4">
                         <Link to="/login" className="text-3xl font-roboto-condensed text-black">Login</Link>
                         <Link to="/register" className="text-3xl font-roboto-condensed text-black">Register</Link>
