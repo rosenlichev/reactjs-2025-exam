@@ -36,7 +36,8 @@ class CwsRecipeService extends CwsBaseService
 					'preparationTime' 	=> get_post_meta($post->ID, 'preparation_time', true) ?? '',
 					'image' 			=> '',
 					'liked' 			=> 0,
-					'comments' 			=> 0
+					'liked_count'		=> (new CwsUserService)->countWishlistUsers($post->ID),
+					'comments_count' 	=> 0
 				];
 
 				$author_id = $post->post_author;
@@ -63,6 +64,10 @@ class CwsRecipeService extends CwsBaseService
 					if ($term) {
 						$prepareRecipe['category'] = $term->name;
 					}
+				}
+
+				if (!empty($comments) && !is_wp_error($comments)) {
+					$recipe['comments_count'] = count($comments);
 				}
 
 				if (is_user_logged_in()) {
@@ -100,7 +105,9 @@ class CwsRecipeService extends CwsBaseService
 					'preparationTime' 	=> get_post_meta($post->ID, 'preparation_time', true) ?? '',
 					'image' 			=> '',
 					'liked' 			=> 0,
-					'comments' 			=> 0
+					'liked_count'		=> (new CwsUserService)->countWishlistUsers($post->ID),
+					'comments' 			=> [],
+					'comments_count' 	=> 0
 				];
 
 				$author_id = $post->post_author;
@@ -152,6 +159,25 @@ class CwsRecipeService extends CwsBaseService
 							'name' 	=> $term->name
 						];
 					}
+				}
+
+				$comments = get_comments([
+					'post_id' 	=> $post->ID,
+					'status' 	=> 'approve',
+					'order' 	=> 'ASC'
+				]);
+
+				if (!empty($comments) && !is_wp_error($comments)) {
+					foreach ($comments as $comment) {
+						$prepareComment = [
+							'id'				=> $comment->comment_ID,
+							'comment_author' 	=> (new CwsUserService)->getUserFullName($comment->user_id),
+							'comment_date' 		=> wp_date(get_option('date_format'), strtotime($comment->comment_date)),
+							'comment_content' 	=> $comment->comment_content
+						];
+						$recipe['comments'][] = $prepareComment;
+					}
+					$recipe['comments_count'] = count($recipe['comments']);
 				}
 
 				if (is_user_logged_in()) {

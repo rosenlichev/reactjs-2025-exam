@@ -143,8 +143,50 @@ class CwsRecipeApiRoutes extends CwsAbstractBaseApiService
 
 	public function cwsToolsAddComment(WP_REST_Request $request)
 	{
-		$_params = $request->get_json_params();
-		$params = [];
+		$params = $request->get_json_params();
+
+		if (!isset($params['comment_content']) || $params['comment_content']  ==  '') {
+			$response   = ['message' => __('Please write your comment before submitting it', 'cws-tools')];
+            $status     = 400;
+
+            $this->api_send_json('addComment', $response, $status ?? 200);
+            die();
+		} elseif (!isseT($params['id']) || $params['id'] == 0) {
+			$response   = ['message' => __('You are submitting a comment to an invalid Recipe', 'cws-tools')];
+            $status     = 400;
+
+            $this->api_send_json('addComment', $response, $status ?? 200);
+            die();
+		} else {
+			$user_id = get_current_user_id();
+
+			$comment_fields = [
+				'comment_post_ID' 	=> $params['id'],
+				'comment_author' 	=> $user_id,
+				'comment_content' 	=> $params['comment_content'],
+				'comment_type' 		=> '',
+				'user_id' 			=> $user_id,
+				'comment_approved' 	=> 1
+			];
+
+			$comment_id = wp_insert_comment($comment_fields);
+
+			if ($comment_id) {
+				$recipe = (new CwsRecipeService)->getRecipeDetails($params);
+
+		        $response = $recipe;
+
+		        $response->put('message', __('Comment has been submitted', 'cws-tools'));
+
+				$this->api_send_json('addComment', $response ?? [], $status ?? 200);
+			} else {
+				$response   = ['message' => __('Your comment could not be submitted at this time. Please try again later.', 'cws-tools')];
+	            $status     = 400;
+
+	            $this->api_send_json('addComment', $response, $status ?? 200);
+	            die();
+			}
+		}
 
 		$this->api_send_json('addComment', $response ?? [], $status ?? 200);
 	}

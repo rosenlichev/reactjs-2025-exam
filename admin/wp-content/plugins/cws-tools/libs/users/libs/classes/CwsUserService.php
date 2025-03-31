@@ -236,41 +236,71 @@ class CwsUserService extends CwsBaseService
 	}
 
     /**
- * Manage a user's wishlist by adding or removing post IDs
- * 
- * @param int    $user_id The user ID
- * @param int    $post_id The post ID to add or remove
- * @param string $mode    Action to perform: 'add' or 'delete'
- * @return bool  True on success, false on failure
- */
-function manageUserWishlist($user_id, $post_id, $mode = 'add') {
-    // Validate parameters
-    if (!$user_id || !$post_id) {
+     * Manage a user's wishlist by adding or removing post IDs
+     * 
+     * @param int    $user_id The user ID
+     * @param int    $post_id The post ID to add or remove
+     * @param string $mode    Action to perform: 'add' or 'delete'
+     * @return bool  True on success, false on failure
+     */
+    function manageUserWishlist($user_id, $post_id, $mode = 'add') {
+        // Validate parameters
+        if (!$user_id || !$post_id) {
+            return false;
+        }
+        
+        // Sanitize inputs
+        $user_id = absint($user_id);
+        $post_id = absint($post_id);
+        $mode = in_array($mode, ['add', 'delete']) ? $mode : 'add';
+        
+        // Get current wishlist
+        $wishlist = get_user_meta($user_id, 'wishlist', false);
+        
+        // Handle add mode
+        if ($mode === 'add') {
+            // Check if post is already in wishlist to avoid duplicates
+            if (!in_array($post_id, $wishlist)) {
+                return add_user_meta($user_id, 'wishlist', $post_id);
+            }
+            return true; // Already in wishlist
+        }
+        
+        // Handle delete mode
+        if ($mode === 'delete') {
+            return delete_user_meta($user_id, 'wishlist', $post_id);
+        }
+        
         return false;
     }
-    
-    // Sanitize inputs
-    $user_id = absint($user_id);
-    $post_id = absint($post_id);
-    $mode = in_array($mode, ['add', 'delete']) ? $mode : 'add';
-    
-    // Get current wishlist
-    $wishlist = get_user_meta($user_id, 'wishlist', false);
-    
-    // Handle add mode
-    if ($mode === 'add') {
-        // Check if post is already in wishlist to avoid duplicates
-        if (!in_array($post_id, $wishlist)) {
-            return add_user_meta($user_id, 'wishlist', $post_id);
+
+    /**
+     * Count how many users have a specific post in their wishlist
+     * 
+     * @param int $post_id The post ID to check
+     * @return int Number of users who have the post in their wishlist
+     */
+    function countWishlistUsers($post_id) {
+        global $wpdb;
+        
+        // Sanitize input
+        $post_id = absint($post_id);
+        
+        if (!$post_id) {
+            return 0;
         }
-        return true; // Already in wishlist
+        
+        // Query the database to count users with this post in their wishlist
+        $count = $wpdb->get_var(
+            $wpdb->prepare(
+                "SELECT COUNT(DISTINCT user_id) 
+                FROM {$wpdb->usermeta} 
+                WHERE meta_key = 'wishlist' 
+                AND meta_value = %d",
+                $post_id
+            )
+        );
+        
+        return (int) $count;
     }
-    
-    // Handle delete mode
-    if ($mode === 'delete') {
-        return delete_user_meta($user_id, 'wishlist', $post_id);
-    }
-    
-    return false;
-}
 }
