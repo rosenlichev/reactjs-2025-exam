@@ -2,7 +2,7 @@ import request from "../utils/request";
 import { useContext, useEffect, useState } from "react";
 import { UserContext } from "../contexts/UserContext";
 
-const baseUrl = "http://dev200.cobweb.work:82/reactjs-2025-exam/admin/wp-json/cws-tools/v1";
+const baseUrl = "https://reactjs-2025-exam.bglist.com/wp-json/cws-tools/v1";
 
 export const useRecipes = () => {
     const { token } = useContext(UserContext);
